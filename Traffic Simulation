@@ -10,22 +10,23 @@ import time
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 import matplotlib.animation as animation 
-
+number_of_cars=50
 Vmax=5
-v=np.random.rand(30) #generate random velocities
+v=np.random.rand(number_of_cars) #generate random velocities
 v2=np.round(v*Vmax,decimals=0)
 #print(v2)
 
-positions=random.sample(range(300), 30)
+positions=random.sample(range(300), number_of_cars)
 #print(positions)
 x_grid=np.empty(300)
 #print(x_grid)
-positions=np.append(positions,[299])
-v2=np.append(v2,[5])
-positions=np.append(positions,[1])
-v2=np.append(v2,[0])
+#positions=np.append(positions,[299])
+#v2=np.append(v2,[5])
+#positions=np.append(positions,[1])
+#v2=np.append(v2,[0])
 car=np.vstack((positions,v2))
-
+data=np.transpose(car)
+print(data)
 print(car)
 #time.sleep(3)
 fuck=car
@@ -39,34 +40,59 @@ for i in positions:
     x_grid[j]=1
 
 #print(x_grid)
-
-
-np.random.seed(19680801)
-
-x=np.zeros(32)
-print(x.shape)
-print(car[0,:].shape)
+with open(r"C:\Users\User\Desktop\Traffic Pictures\fulldata.txt", "w") as f:
+    np.savetxt(f, data)
 
 
 
 
+fig = plt.figure()
+ax1 = fig.add_subplot(1,1,1)
+def animate():
+    zeros=np.zeros(number_of_cars)
+    graph_data = open(r"C:\Users\User\Desktop\Traffic Pictures\fulldata.txt",'r').read()
+    lines = graph_data.split('\n')
+    xs = []
+    ys = []
+    for line in lines:
+        if len(line) > 1:
+            x, y = line.split(' ')
+            xs.append(float(x))
+            ys.append(float(y))
+    ax1.clear()
+    plt.ylim(0,300)
+    ax1.set_yticks(np.arange(0,305,5))
+    ax1.scatter(zeros, xs, s=10, c=ys, linestyle='-', linewidth=1 )
+    ax1.grid(b=True,axis='y',alpha=1)
+    
+    plt.pause(0.05)
 
 
 
-plt.yticks(np.arange(0,305,5))
-plt.scatter(x, car[0,:], s=10, c=car[1,:], linestyle='-', linewidth=1 )
-plt.grid(b=True,axis='y',alpha=1)
 
-filename =(r"C:\Users\User\Desktop\Traffic Pictures\Plot.png")
 
-plt.savefig(filename, dpi = 350)
-plt.show()
-plt.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def new_velocity(car1,x_grid1):
     new=-1
     
-    for i in range(32):
+    for i in range(number_of_cars):
         loop=False
         still_remember=0
 #        print(car1[1,i])
@@ -300,16 +326,15 @@ def new_velocity(car1,x_grid1):
 
 
 
+for h in range(100):
+    z,z1=new_velocity(car,x_grid)      
+    print(z)
+    new_data=np.transpose(z)
+    with open(r"C:\Users\User\Desktop\Traffic Pictures\fulldata.txt", "w") as f:
+        np.savetxt(f, data)
+    animate()
+    
+    
 
-z,z1=new_velocity(car,x_grid)      
-print(z)      
 
-def traffic(car):
-    mpl.style.use(sty)
-    fig, ax = plt.subplots(figsize=(3, 3))
 
-    ax.set_title('style: {!r}'.format(sty), color='C0')
-
-    ax.plot(th, np.cos(th), 'C1', label='C1')
-    ax.plot(th, np.sin(th), 'C2', label='C2')
-    ax.legend()
