@@ -10,8 +10,11 @@ import time
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 import matplotlib.animation as animation 
-number_of_cars=50
+
+lockgrid=True
+number_of_cars=30
 Vmax=5
+
 v=np.random.rand(number_of_cars) #generate random velocities
 v2=np.round(v*Vmax,decimals=0)
 #print(v2)
@@ -19,6 +22,7 @@ v2=np.round(v*Vmax,decimals=0)
 positions=random.sample(range(300), number_of_cars)
 #print(positions)
 x_grid=np.empty(300)
+lockgrid_position=150
 #print(x_grid)
 #positions=np.append(positions,[299])
 #v2=np.append(v2,[5])
@@ -38,9 +42,10 @@ for i in positions:
     j=int(i)
 #    print(j)
     x_grid[j]=1
+x_grid[lockgrid_position]=0
 
 #print(x_grid)
-with open(r"C:\Users\User\Desktop\Traffic Pictures\fulldata.txt", "w") as f:
+with open(r"C:\Users\ur2g17\Desktop\Traffic Pictures\fulldata.txt", "w") as f:
     np.savetxt(f, data)
 
 
@@ -48,9 +53,9 @@ with open(r"C:\Users\User\Desktop\Traffic Pictures\fulldata.txt", "w") as f:
 
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
-def animate():
+def animate(h):
     zeros=np.zeros(number_of_cars)
-    graph_data = open(r"C:\Users\User\Desktop\Traffic Pictures\fulldata.txt",'r').read()
+    graph_data = open(r"C:\Users\ur2g17\Desktop\Traffic Pictures\fulldata.txt",'r').read()
     lines = graph_data.split('\n')
     xs = []
     ys = []
@@ -61,6 +66,7 @@ def animate():
             ys.append(float(y))
     ax1.clear()
     plt.ylim(0,300)
+    plt.title("Time"+str(h))
     ax1.set_yticks(np.arange(0,305,5))
     ax1.scatter(zeros, xs, s=10, c=ys, linestyle='-', linewidth=1 )
     ax1.grid(b=True,axis='y',alpha=1)
@@ -99,7 +105,12 @@ def new_velocity(car1,x_grid1):
 #        print(car1[0,i])
 #        print(x_grid1[int(car1[0,i])])
         if car1[1,i]<Vmax:
-            
+            p=np.random.rand(1)
+            print(p)
+            if p<0.25:
+                print("CAR BREAKDOWN")
+                car[1,i]=0
+                break
             car1[1,i]=car1[1,i]+1 #increase velocity by 1
 #            print("new velocity " + str(car1[1,i]))
             overtake = True
@@ -215,6 +226,12 @@ def new_velocity(car1,x_grid1):
             #future_space=(car[0,i]+car[1,i])
         elif car1[1,i]==Vmax:    
             overtake = True
+            p=np.random.rand(1)
+            print(p)
+            if p<0.25:
+                print("CAR BREAKDOWN")
+                car[1,i]=0
+                break
             for j in range(1,int(car1[1,i])+1):
                 j1=j+1 #seeker
  #               print(j)
@@ -326,15 +343,14 @@ def new_velocity(car1,x_grid1):
 
 
 
-for h in range(100):
+for h in range(1000):
     z,z1=new_velocity(car,x_grid)      
     print(z)
     new_data=np.transpose(z)
-    with open(r"C:\Users\User\Desktop\Traffic Pictures\fulldata.txt", "w") as f:
+    with open(r"C:\Users\ur2g17\Desktop\Traffic Pictures\fulldata.txt", "w") as f:
         np.savetxt(f, data)
-    animate()
+    animate(h)
     
     
-
 
 
