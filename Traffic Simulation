@@ -7,118 +7,350 @@ Created on Sat Feb  1 18:44:37 2020
 import random
 import numpy as np
 import time
+import matplotlib.pyplot as plt
+import matplotlib.ticker as plticker
+import matplotlib.animation as animation 
+
+lockgrid=True
+number_of_cars=30
 Vmax=5
-v=np.random.rand(30) #generate random velocities
+
+v=np.random.rand(number_of_cars) #generate random velocities
 v2=np.round(v*Vmax,decimals=0)
-print(v2)
+#print(v2)
 
-positions=random.sample(range(300), 30)
-print(positions)
+positions=random.sample(range(300), number_of_cars)
+#print(positions)
 x_grid=np.empty(300)
-print(x_grid)
+lockgrid_position=150
+#print(x_grid)
+#positions=np.append(positions,[299])
+#v2=np.append(v2,[5])
+#positions=np.append(positions,[1])
+#v2=np.append(v2,[0])
 car=np.vstack((positions,v2))
-
+data=np.transpose(car)
+print(data)
 print(car)
-
-print(car.shape)
-print(x_grid.shape)
+#time.sleep(3)
+fuck=car
+#print(fuck)
+#time.sleep(3)
+#print(car.shape)
+#print(x_grid.shape)
 for i in positions:
     j=int(i)
-    print(j)
+#    print(j)
     x_grid[j]=1
+x_grid[lockgrid_position]=0
 
-print(x_grid)
+#print(x_grid)
+with open(r"C:\Users\ur2g17\Desktop\Traffic Pictures\fulldata.txt", "w") as f:
+    np.savetxt(f, data)
 
 
 
-def new_velocity(car,x_grid):
-    for i in range(3):
-        print(car[1,i])
-        print(car[0,i])
-        print(x_grid[int(car[0,i])])
-        if car[1,i]<Vmax:
-            
-            car[1,i]=car[1,i]+1 #increase velocity by 1
-            print("new velocity " + str(car[1,i]))
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1,1,1)
+def animate(h):
+    zeros=np.zeros(number_of_cars)
+    graph_data = open(r"C:\Users\ur2g17\Desktop\Traffic Pictures\fulldata.txt",'r').read()
+    lines = graph_data.split('\n')
+    xs = []
+    ys = []
+    for line in lines:
+        if len(line) > 1:
+            x, y = line.split(' ')
+            xs.append(float(x))
+            ys.append(float(y))
+    ax1.clear()
+    plt.ylim(0,300)
+    plt.title("Time"+str(h))
+    ax1.set_yticks(np.arange(0,305,5))
+    ax1.scatter(zeros, xs, s=10, c=ys, linestyle='-', linewidth=1 )
+    ax1.grid(b=True,axis='y',alpha=1)
+    
+    plt.pause(0.05)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def new_velocity(car1,x_grid1):
+    new=-1
+    
+    for i in range(number_of_cars):
+        loop=False
+        still_remember=0
+#        print(car1[1,i])
+#        print(car1[0,i])
+#        print(x_grid1[int(car1[0,i])])
+        if car1[1,i]<Vmax:
+            p=np.random.rand(1)
+            print(p)
+            if p<0.25:
+                print("CAR BREAKDOWN")
+                car[1,i]=0
+                break
+            car1[1,i]=car1[1,i]+1 #increase velocity by 1
+#            print("new velocity " + str(car1[1,i]))
             overtake = True
             
             
                 
             
-            for j in range(1,int(car[1,i])+1):
+            for j in range(1,int(car1[1,i])+1):
                 j1=j+1 #seeker
-                print(j)
-                print(j1)
-                print(x_grid[int(car[0,i])+j])
-                print(x_grid[int(car[0,i])+j1])
-                if car[0,i]+j<299:
+#                print("j is " +str(j))
+#                print("j1 is " +str(j1))
+ #               print(x_grid[int(car[0,i])+j])
+                
+                if car1[0,i]+j1<=299 and loop==False:
 
-                    if j1>car[1,i]:
-                        print("unobstructed drive")
-                        car[0,i]=car[0,i]+car[1,i]    
-                        x_grid[int(car[0,i])]=0
-                        x_grid[int(car[0,i])+int(car[1,i])]=1
+                    if j1>car1[1,i]:
+ #                       print("unobstructed drive")
+                        x_grid1[int(car1[0,i])]=0
+                        car1[0,i]=car1[0,i]+car1[1,i]    
+                        
+                        x_grid1[int(car1[0,i])]=1
                         break
                     
-                    if x_grid[int(car[0,i])+j] ==1 :
-                        print("car in front ")
-                        car[1,i]=0
+                    if x_grid1[int(car1[0,i])+j] ==1 :
+#                        print("car in front ")
+                        car1[1,i]=0
                         break
                     
-                    elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] !=1 : 
-                        print(" we can keep driving")
+                    elif x_grid1[int(car1[0,i])+j] !=1 and x_grid1[int(car1[0,i])+j1] !=1 : 
+#                        print(" we can keep driving")
                         overtake= True
                  
-                    elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] ==1 :
-                        print("Space occupied in front ")
+                    elif x_grid1[int(car1[0,i])+j] !=1 and x_grid1[int(car1[0,i])+j1] ==1 :
+#                        print("Space occupied in front ")
                         overtake=False
-                        x_grid[int(car[0,i])]=0
-                        x_grid[int(car[0,i])+j]=1 
-                        car[1,i]=j
-                        car[0,i]=car[0,i]+j
+                        x_grid1[int(car1[0,i])]=0
+                        x_grid1[int(car1[0,i])+j]=1 
+                        car1[1,i]=j
+                        car1[0,i]=car1[0,i]+j
                         break
+                
+                elif car1[0,i]+j1>299 and j1>car1[1,i] and new==-1:
+ #                   print("j1 " +str(j1))
+ #                   print("velocity" + str(car1[1,i]))
+                    x_grid1[int(car1[0,i])]=0
+                    car1[0,i]=299
+                    x_grid1[int(car1[0,i])]=1
+                    car[1,0]=j
+                    break
+                
+                elif car1[0,i]+j1>299 or loop==True:
+                    loop=True
+                    remember_start_position=299-car1[0,i]
+                    if remember_start_position==299:
+                        remember_start_position=still_remember
+                        new= int(j-(remember_start_position))
+                        new1=new+1
+                    else:
+                        
+                        new= int(j-(remember_start_position))
+                        new1=new+1
+                        still_remember=remember_start_position
+                            
                     
-
+                    
+                            
+#                    print(x_grid1[int(car1[0,i])+new])
+                    if x_grid1[0]==1:
+ #                       print("car in spce 0")
+                        
+                        car1[1,i]=299-car1[0,i]
+                        x_grid1[int(car1[0,i])]=0
+                        car1[0,i]=299
+                        x_grid1[int(car1[0,i])]=1
+                    elif x_grid1[0]!=1:
+                        x_grid1[int(car1[0,i])]=0
+                        car1[0,i]=0
+                        
+ #                       print("temporarily stopping at first position")
+ #                       print("new "+str(new))
+  #                      print("new1 "+str(new1))
+                        if new1>car1[1,i]:
+#                            print("over 299 unobstructed drive")
+                            x_grid1[int(car1[0,i])]=0
+                            car1[0,i]=car1[0,i]+car1[1,i]    
+                            
+                            x_grid1[int(car1[0,i])+new]=1
+                            break
+                            
+                        if x_grid1[int(car1[0,i])+new] ==1 :
+#                            print("over 299 car in front ")
+                            car1[1,i]=0
+                            break
+                        if x_grid1[int(car1[0,i])+new] !=1 and x_grid1[int(car1[0,i])+new1] !=1 and j1>car1[1,i] :
+                            car1[0,i]=car1[0,i]+new
+ #                           print("loop ending car velocity " +str(car1[1,i]))
+                            break
+                        elif x_grid1[int(car1[0,i])+new] !=1 and x_grid1[int(car1[0,i])+new1] !=1 : 
+  #                          print(" over 299 we can keep driving")
+                            #print(299-j)
+                            overtake= True
+                           # car1[0,i]=299-j
+                         
+                        elif x_grid1[int(car1[0,i])+new] !=1 and x_grid1[int(car1[0,i])+new1] ==1 :
+  #                          print("over 299 Space occupied in front ")
+                            overtake=False
+                            x_grid1[int(car1[0,i])]=0
+                            x_grid1[int(car1[0,i])+new]=1 
+                            car1[1,i]=j
+                            car1[0,i]=car1[0,i]+new
+                            break
+                            
             #future_space=(car[0,i]+car[1,i])
-        elif car[1,i]==Vmax:    
+        elif car1[1,i]==Vmax:    
             overtake = True
-            for j in range(1,int(car[1,i])+1):
+            p=np.random.rand(1)
+            print(p)
+            if p<0.25:
+                print("CAR BREAKDOWN")
+                car[1,i]=0
+                break
+            for j in range(1,int(car1[1,i])+1):
                 j1=j+1 #seeker
-                print(j)
-                print(j1)
-                print(x_grid[int(car[0,i])+j])
-                print(x_grid[int(car[0,i])+j1])
-                if car[0,i]+j<299:
-                    if j1>car[1,i]:
-                        print("unobstructed drive")
-                        car[0,i]=car[0,i]+car[1,i]    
-                        x_grid[int(car[0,i])]=0
-                        x_grid[int(car[0,i])+int(car[1,i])]=1
+ #               print(j)
+ #               print(j1)
+#                print(x_grid1[int(car1[0,i])+j])
+#                print(x_grid1[int(car1[0,i])+j1])
+                if car1[0,i]+j1<=299 and loop==False:
+                    if j1>car1[1,i]:
+  #                      print("unobstructed drive")
+                        x_grid1[int(car1[0,i])]=0
+                        car1[0,i]=car1[0,i]+car1[1,i]    
+                        
+                        x_grid1[int(car1[0,i])]=1
                         break
-                    if x_grid[int(car[0,i])+j] ==1 :
-                        print("car in front ")
-                        car[1,i]=0
+                    if x_grid1[int(car1[0,i])+j] ==1 :
+   #                     print("car in front ")
+                        car1[1,i]=0
                         break
                     
-                    elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] !=1 : 
-                        print(" we can keep driving")
+                    elif x_grid1[int(car1[0,i])+j] !=1 and x_grid1[int(car1[0,i])+j1] !=1 : 
+  #                      print(" we can keep driving")
                         overtake= True
                  
-                    elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] ==1 :
-                        print("Space occupied in front ")
+                    elif x_grid1[int(car1[0,i])+j] !=1 and x_grid1[int(car1[0,i])+j1] ==1 :
+  #                      print("Space occupied in front ")
                         overtake=False
-                        x_grid[int(car[0,i])]=0
-                        x_grid[int(car[0,i])+j]=1 
-                        car[1,i]=j
-                        car[0,i]=car[0,i]+j
+                        x_grid1[int(car1[0,i])]=0
+                        x_grid1[int(car1[0,i])+j]=1 
+                        car1[1,i]=j
+                        car1[0,i]=car1[0,i]+j
                         break
+                    elif car1[0,i]+j1>299 and j1>car1[1,i] and new==-1:
+  #                      print("j1 " +str(j1))
+  #                      print("velocity" + str(car1[1,i]))
+                        x_grid1[int(car1[0,i])]=0
+                        car1[0,i]=299
+                        x_grid1[int(car1[0,i])]=1
+                        car[1,0]=j
+                        break
+                
+                elif car1[0,i]+j1>299 or loop==True:
+                    loop=True
+                    remember_start_position=299-car1[0,i]
+                    if remember_start_position==299:
+                        remember_start_position=still_remember
+                        new= int(j-(remember_start_position))
+                        new1=new+1
+                    else:
+                        
+                        new= int(j-(remember_start_position))
+                        new1=new+1
+                        still_remember=remember_start_position
+                            
+                    
+                    
+                            
+                    #print(x_grid1[int(car1[0,i])+new])
+                    if x_grid1[0]==1:
+  #                      print("car in spce 0")
+                        
+                        car1[1,i]=299-car1[0,i]
+                        x_grid1[int(car1[0,i])]=0
+                        car1[0,i]=299
+                        x_grid1[int(car1[0,i])]=1
+                    elif x_grid1[0]!=1:
+                        x_grid1[int(car1[0,i])]=0
+                        car1[0,i]=0
+                        
+  #                      print("temporarily stopping at first position")
+  #                      print("new "+str(new))
+  #                      print("new1 "+str(new1))
+                        if new1>car1[1,i]:
+   #                         print("over 299 unobstructed drive")
+                            x_grid1[int(car1[0,i])]=0
+                            car1[0,i]=car1[0,i]+car1[1,i]    
+                            
+                            x_grid1[int(car1[0,i])+new]=1
+                            break
+                            
+                        if x_grid1[int(car1[0,i])+new] ==1 :
+   #                         print("over 299 car in front ")
+                            car1[1,i]=0
+                            break
+                        if x_grid1[int(car1[0,i])+new] !=1 and x_grid1[int(car1[0,i])+new1] !=1 and j1>car1[1,i] :
+                            car1[0,i]=car1[0,i]+new
+   #                         print("loop ending car velocity " +str(car1[1,i]))
+                            break
+                        elif x_grid1[int(car1[0,i])+new] !=1 and x_grid1[int(car1[0,i])+new1] !=1 : 
+   #                         print(" over 299 we can keep driving")
+                            #print(299-j)
+                            overtake= True
+                           # car1[0,i]=299-j
+                         
+                        elif x_grid1[int(car1[0,i])+new] !=1 and x_grid1[int(car1[0,i])+new1] ==1 :
+    #                        print("over 299 Space occupied in front ")
+                            overtake=False
+                            x_grid1[int(car1[0,i])]=0
+                            x_grid1[int(car1[0,i])+new]=1 
+                            car1[1,i]=j
+                            car1[0,i]=car1[0,i]+new
+                            break
              
 
 
-        print("new velocity " + str(car[1,i]))
-        print("new position " + str(car[0,i]))
+     #   print("new velocity " + str(car1[1,i]))
+      #  print("new position " + str(car1[0,i]))
         
-    return car, x_grid    
+    return car1, x_grid1    
 
-z=new_velocity(car,x_grid)      
-          
+
+
+for h in range(1000):
+    z,z1=new_velocity(car,x_grid)      
+    print(z)
+    new_data=np.transpose(z)
+    with open(r"C:\Users\ur2g17\Desktop\Traffic Pictures\fulldata.txt", "w") as f:
+        np.savetxt(f, data)
+    animate(h)
+    
+    
+
+
