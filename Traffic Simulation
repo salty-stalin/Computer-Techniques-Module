@@ -9,13 +9,13 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 Vmax=5
-length_of_road=200
-number_of_cars=2
+length_of_road=100
+number_of_cars=20
 v=np.random.rand(number_of_cars) #generate random velocities
 v2=np.round(v*Vmax,decimals=0)
 #print(v2)
 
-positions=random.sample(range(length_of_road), number_of_cars)
+positions=random.sample(range(int(length_of_road*0.5)), number_of_cars)
 #print(positions)
 y_grid1=np.empty(length_of_road)
 #print(y_grid1)
@@ -26,9 +26,9 @@ print(car1)
 #print(car1.shape)
 #print(y_grid1.shape)
 for i in positions:
-    j=int(i)
+    bn=int(i)
 #    print(j)
-    y_grid1[j]=1
+    y_grid1[bn]=1
 
 #print(x_grid1)
 
@@ -62,26 +62,31 @@ def animate(h):
     plt.pause(1)
 
 
-def drive_y_forward(car,y_grid,j,i):
-    j1=j+1
+def drive_y_forward(car,y_grid,j,i,j1):
     if car[0,i]+j1<length_of_road:
+        
+        if y_grid[int(car[0,i])+j] ==1 :
+            print("car in front ")
+            car[1,i]=0
+            overtake=False
+            return False
+        
+        
+        
         if j1>car[1,i]:
             #print("unobstructed drive")
             y_grid[int(car[0,i])]=0
             car[0,i]=car[0,i]+car[1,i]    
-            
+                
             y_grid[int(car[0,i])]=1
-            return car,y_grid
-                                    
-        if y_grid[int(car[0,i])+j] ==1 :
-            #print("car in front ")
-            car[1,i]=0
-            return car,y_grid
-                                    
+            overtake=False
+            return False
+                                        
+                                        
         elif y_grid[int(car[0,i])+j] !=1 and y_grid[int(car[0,i])+j1] !=1 : 
             #print(" we can keep driving")
-            overtake= True
-            
+            return True
+                
         elif y_grid[int(car[0,i])+j] !=1 and y_grid[int(car[0,i])+j1] ==1 :
             #print("Space occupied in front ")
             overtake=False
@@ -89,27 +94,33 @@ def drive_y_forward(car,y_grid,j,i):
             y_grid[int(car[0,i])+j]=1 
             car[1,i]=j
             car[0,i]=car[0,i]+j
-            return car,y_grid     
+            return False
+             
 
 
 def new_velocity(car,y_grid,lenth_of_road):
     for i in range(number_of_cars):
-        # print(car[1,i])
+        #print(car[1,i])
         #print(car[0,i])
         #print(x_grid[int(car[0,i])])
         if car[1,i]<Vmax:
-            
+            y_grid[70]=1
             car[1,i]=car[1,i]+1 #increase velocity by 1
             #print("new velocity " + str(car[1,i]))
             overtake = True
-            for j in range(1,int(car[1,i])+1):
-                print(i)
-                print(j)
-                time.sleep(3)
-                #print(j1)
+            j=1
+            while True and j<int(car[1,i]+1):
+                
+                #print(i)
+                #print(j)
+                
                 #print(x_grid[int(car[0,i])+j])
                 #print(x_grid[int(car[0,i])+j1])
-                car,y_grid=drive_y_forward(car,y_grid,j,i)
+                
+                j1=j+1
+                
+                drive_y_forward(car,y_grid,j,i,j1)
+                j=j+1
                  
 
                 
@@ -119,39 +130,17 @@ def new_velocity(car,y_grid,lenth_of_road):
 
             #future_space=(car[0,i]+car[1,i])
         elif car[1,i]==Vmax:    
+            y_grid[70]=1
             overtake = True
-            for j in range(1,int(car[1,i])+1):
+            j=1
+            while True and j<int(car[1,i]+1):
                 j1=j+1 #seeker
                 #print(j)
                 #print(j1)
                 #print(x_grid[int(car[0,i])+j])
                 #print(x_grid[int(car[0,i])+j1])
-                if car[0,i]+j1<length_of_road:
-                    if j1>car[1,i]:
-                        #print("unobstructed drive")
-                        y_grid[int(car[0,i])]=0
-                        car[0,i]=car[0,i]+car[1,i]    
-                        
-                        y_grid[int(car[0,i])]=1
-                        break
-                                    
-                    if y_grid[int(car[0,i])+j] ==1 :
-                        #print("car in front ")
-                        car[1,i]=0
-                        break
-                                    
-                    elif y_grid[int(car[0,i])+j] !=1 and y_grid[int(car[0,i])+j1] !=1 : 
-                        #print(" we can keep driving")
-                        overtake= True
-                                 
-                    elif y_grid[int(car[0,i])+j] !=1 and y_grid[int(car[0,i])+j1] ==1 :
-                        #print("Space occupied in front ")
-                        overtake=False
-                        y_grid[int(car[0,i])]=0
-                        y_grid[int(car[0,i])+j]=1 
-                        car[1,i]=j
-                        car[0,i]=car[0,i]+j
-                        break   
+                drive_y_forward(car,y_grid,j,i,j1)
+                j=j+1
              
 
 
@@ -161,9 +150,9 @@ def new_velocity(car,y_grid,lenth_of_road):
     return car, y_grid    
  
 
-
-for h in range(10):
-    print(car1)
+print(car1)
+for h in range(20):
+    
     z,z1=new_velocity(car1,y_grid1,length_of_road)      
     print(z)
     new_data=np.transpose(z)
