@@ -1,0 +1,32 @@
+import math
+import pylab
+from random import random
+
+def distance(n):
+	"Computes distance moved after n random steps"
+	x=y=z=0                             # Start at origin
+	for i in range(0,n):                # Count steps
+		c=2.0*random()-1.0            # c=cos(theta)
+		s=(1.0-c*c)**0.5                 # s=sin(theta)
+		phi=2.0*math.pi*random()           # phi is random azimuth
+		x+=s*math.cos(phi)                   # calculate new position
+		y+=s*math.sin(phi)
+		z+=c
+	
+	return (x*x+y*y+z*z)**0.5            # final distance from origin
+
+#----------------------------------------------------------------------------
+
+nbins=20
+jmax=nbins-1                            # Size of array containing distances
+n=3                                     # Number of steps
+nwalk=50000
+deltaR=(1.1*n)/jmax
+m=[0 for i in range(0,jmax)]            # Zero array 
+for k in range(0,nwalk):                # Count walks
+	R=distance(n)                       # Determine distance from start
+	j=int(math.floor(R/deltaR+0.5))          # Convert to bin number
+	if j<jmax: m[j]+=1                  # Increment count of distance bin
+
+pylab.bar(range(len(m)),m,width=1.)
+pylab.show()
