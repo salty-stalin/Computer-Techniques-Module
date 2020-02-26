@@ -10,7 +10,7 @@ import time
 import matplotlib.pyplot as plt
 Vmax=5
 length_of_road=100
-number_of_cars=15
+number_of_cars=2
 v=np.random.rand(number_of_cars) #generate random velocities
 v2=np.round(v*Vmax,decimals=0)
 #print(v2)
@@ -106,7 +106,79 @@ def drive_y_forward(car,x_grid,y_grid,j,i,j1):
             car[2,i]=j
             car[1,i]=car[1,i]+j
             return False
-             
+        
+        
+def drive_x_right(car,x_grid,y_grid,j,i,j1):
+    print(j)
+    print(j1)
+    if car[4,i]+j1<length_of_road:
+        
+        if x_grid[int(car[0,i])+j] ==1 and car[4,i]==3:
+            print("car in front ")
+            car[3,i]=0
+            overtake=False
+            return False
+        
+        
+        
+        if j1>car[3,i] and car[4,i]==3:
+            #print("unobstructed drive")
+            x_grid[int(car[0,i])]=0
+            car[0,i]=car[0,i]+car[3,i]    
+                
+            x_grid[int(car[0,i])]=1
+            overtake=False
+            return False
+                                        
+                                        
+        elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] !=1 and car[4,i]==3: 
+            #print(" we can keep driving")
+            return True
+                
+        elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] ==1 and car[4,i]==3:
+            print("Space occupied in front ")
+            overtake=False
+            x_grid[int(car[0,i])]=0
+            x_grid[int(car[0,i])+j]=1 
+            car[3,i]=j
+            car[0,i]=car[0,i]+j
+            return False  
+def drive_x_left(car,x_grid,y_grid,j,i,j1):
+        j=j*-1
+        j1=j1*-1
+        if car[4,i]+j1<length_of_road:
+        
+            if x_grid[int(car[0,i])+j] ==1 and car[4,i]==3:
+                print("car in front ")
+                car[3,i]=0
+                overtake=False
+                return False
+            
+            
+            
+            if (-1*j1)>car[3,i] and car[4,i]==3:
+                #print("unobstructed drive")
+                x_grid[int(car[0,i])]=0
+                car[0,i]=car[0,i]+j    
+                    
+                x_grid[int(car[0,i])]=1
+                overtake=False
+                return False
+                                            
+                                            
+            elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] !=1 and car[4,i]==3: 
+                #print(" we can keep driving")
+                return True
+                    
+            elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] ==1 and car[4,i]==3:
+                print("Space occupied in front ")
+                overtake=False
+                x_grid[int(car[0,i])]=0
+                x_grid[int(car[0,i])+j]=1 
+                car[3,i]=j
+                car[0,i]=car[0,i]+j
+                return False  
+               
 
 def drive_y_backward(car,x_grid,y_grid,j,i,j1):
     j=j*-1
@@ -121,7 +193,7 @@ def drive_y_backward(car,x_grid,y_grid,j,i,j1):
         
         
         
-        if j1>car[2,i] and car[4,i]==1:
+        if (j1*-1)>car[2,i] and car[4,i]==1:
             #print("unobstructed drive")
             y_grid[int(car[1,i])]=0
             car[1,i]=car[1,i]+car[2,i]    
@@ -144,9 +216,48 @@ def drive_y_backward(car,x_grid,y_grid,j,i,j1):
             car[1,i]=car[0,i]+j
             return False
 
-#def central_crossroad(car,x_grid,y_grid,j,i,j1):
-    #which_way=np.random.randint(0,4)
-    #if which_way==0: #driving forward
+
+def drive(car,x_grid,y_grid,j,i,j1):
+    if car[4,i]==0:
+        drive_y_forward(car,x_grid,y_grid,j,i,1)
+    elif car[4,i]==1:
+        drive_y_backward(car,x_grid,y_grid,j,i,1)
+    elif car[4,i]==2:
+        drive_x_left(car,x_grid,y_grid,j,i,j1)
+    elif car[4,i]==3:
+        drive_x_right(car,x_grid,y_grid,j,i,j1)
+        
+def central_crossroad(car,x_grid,y_grid,j,i,j1):
+    car[2,i]=0#car needs to stop at traffic light
+    car[3,i]=0
+    which_way=np.random.randint(0,4)
+    if which_way==0: #driving forward
+        y_grid(int(car[1,i]))=0 
+        x_grid(int(car[0,i]))=0
+        car[1,i]=51
+        car[0,i]=0
+        y_grid[51]=1
+        car[4,i]=0
+    elif which_way==2: #driving left
+        y_grid(int(car[1,i]))=0 
+        x_grid(int(car[0,i]))=0
+        car[1,i]=49
+        car[0,i]=-1
+        y_grid[49]=1
+        x_grid[-1]=1
+        car[4,i]=2
+    elif which_way==3: #driving right
+        y_grid(int(car[1,i]))=0 
+        x_grid(int(car[0,i]))=0
+        car[1,i]=50
+        car[0,i]=2
+        y_grid[50]=1
+        x_grid[2]=1
+        car[4,i]=3
+    return car, x_grid,y_grid
+
+        
+        
 
 def new_velocity(car,x_grid,y_grid,lenth_of_road):
     for i in range(number_of_cars):
@@ -156,13 +267,16 @@ def new_velocity(car,x_grid,y_grid,lenth_of_road):
             j=1
             while True and j<int(car[2,i]+1):
                 j1=j+1
-                #if ((j+car[1,i]=>49) and car[4,i]==0) or ((j+car[1,i]=>49) and car[4,i]==1) :#we are at the central cross road coming from downside
-
+                if ((j+car[1,i]>=48) and car[4,i]==0): #we are at the central cross road coming from downside
+                    y_grid(int(car[1,0]))==0
+                    car[1,i]=48
+                    car,x_grid,y_grid=central_crossroad(car,x_grid,y_grid,j,i,j1)
+                    
                     
                     
                 
                     
-                drive_y_forward(car,x_grid,y_grid,j,i,j1)
+                drive(car,x_grid,y_grid,j,i,j1)
                 j=j+1
                  
             #future_space=(car[0,i]+car[1,i])
@@ -171,7 +285,7 @@ def new_velocity(car,x_grid,y_grid,lenth_of_road):
             j=1
             while True and j<int(car[2,i]+1):
                 j1=j+1 #seeker
-                drive_y_forward(car,x_grid,y_grid,j,i,j1)
+                drive(car,x_grid,y_grid,j,i,j1)
                 j=j+1
                
     return car, y_grid    
