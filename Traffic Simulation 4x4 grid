@@ -4,6 +4,7 @@ Created on Sat Feb  1 18:44:37 2020
 
 @author: User
 """
+from math import fabs
 import random
 import numpy as np
 import time
@@ -39,12 +40,8 @@ for i in x_positions:
 
     x_grid1[bn]=1
 
-
-
 with open(r"C:\Users\User\Desktop\Traffic Pictures\fulldata2.txt", "w") as f:
     np.savetxt(f, data)
-
-
 
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
@@ -73,53 +70,54 @@ def animate(h):
     plt.pause(1)
 
 
-def drive_y_forward(car,x_grid,y_grid,j,i,j1,loop):
+def drive_y(car,x_grid,y_grid,j,i,j1,loop, sign):
+
+    j=j*sign
+    j1=j1*sign
     print(j)
     print(j1)
     if car[1,i]+j1<length_of_road:
         
-        if y_grid[int(car[1,i])+j] ==1 and car[4,i]==0 :
+        if y_grid[int(car[1,i])+j] ==1 :
             print("car in front ")
             car[2,i]=0
-            overtake=False
             loop=False
             return loop
         
         
         
-        if j1>car[2,i] and car[4,i]==0:
+        elif fabs(j1)>car[2,i] :
             print("unobstructed drive")
             y_grid[int(car[1,i])]=0
             car[1,i]=car[1,i]+car[2,i]    
                 
             y_grid[int(car[1,i])]=1
-            overtake=False
             loop= False
             return loop
                                         
                                         
-        elif y_grid[int(car[1,i])+j] !=1 and y_grid[int(car[1,i])+j1] !=1 and car[4,i]==0: 
+        elif y_grid[int(car[1,i])+j] !=1 and y_grid[int(car[1,i])+j1] !=1 : 
             print(" we can keep driving")
             loop=True
             return loop
                 
-        elif y_grid[int(car[1,i])+j] !=1 and y_grid[int(car[1,i])+j1] ==1 and car[4,i]==0:
+        elif y_grid[int(car[1,i])+j] !=1 and y_grid[int(car[1,i])+j1] ==1:
             print("Space occupied in front ")
-            overtake=False
             y_grid[int(car[1,i])]=0
             y_grid[int(car[1,i])+j]=1 
             car[2,i]=j
             car[1,i]=car[1,i]+j
             loop=False
             return loop
-        
-        
-def drive_x_right(car,x_grid,y_grid,j,i,j1,loop):
+def drive_x(car,x_grid,y_grid,j,i,j1,loop,sign):
+    j=j*sign
+    j1=j1*sign
+    print("SIGN IS " +str(sign))
     print(j)
     print(j1)
     if car[0,i]+j1<length_of_road:
         
-        if x_grid[int(car[0,i])+j] ==1 and car[4,i]==3:
+        if x_grid[int(car[0,i])+j] ==1:
             print("car in front right ")
             car[2,i]=0
             loop=False
@@ -127,122 +125,45 @@ def drive_x_right(car,x_grid,y_grid,j,i,j1,loop):
         
         
         
-        if j1>car[2,i] and car[4,i]==3:
+        elif fabs(j1)>car[2,i] :
             print("unobstructed drive right")
             x_grid[int(car[0,i])]=0
-            car[0,i]=car[0,i]+car[2,i]    
+            car[0,i]=car[0,i]+j   
                 
             x_grid[int(car[0,i])]=1
             loop=False
             return loop
                                         
                                         
-        elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] !=1 and car[4,i]==3: 
+        elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] !=1: 
             print(" we can keep driving right")
             loop=True
             return loop
                 
-        elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] ==1 and car[4,i]==3:
+        elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] ==1:
             print("Space occupied in front right ")
-            overtake=False
             x_grid[int(car[0,i])]=0
             x_grid[int(car[0,i])+j]=1 
             car[2,i]=j
             car[0,i]=car[0,i]+j
             loop=False
             return loop
-def drive_x_left(car,x_grid,y_grid,j,i,j1,loop):
-        j=j*-1
-        j1=j1*-1
-        if car[0,i]+j1<length_of_road:
         
-            if x_grid[int(car[0,i])+j] ==1 and car[4,i]==2:
-                print("car in front left ")
-                car[2,i]=0
-                loop=False
-                return loop
-            
-            
-            
-            if (-1*j1)>car[2,i] and car[4,i]==2:
-                print("unobstructed drive left")
-                x_grid[int(car[0,i])]=0
-                car[0,i]=car[0,i]+j    
-                    
-                x_grid[int(car[0,i])]=1
-                loop=False
-                return loop
-                                            
-                                            
-            elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] !=1 and car[4,i]==2: 
-                print(" we can keep driving left")
-                loop=True
-                return loop
-                    
-            elif x_grid[int(car[0,i])+j] !=1 and x_grid[int(car[0,i])+j1] ==1 and car[4,i]==2:
-                print("Space occupied in front left")
-                loop=False
-                x_grid[int(car[0,i])]=0
-                x_grid[int(car[0,i])+j]=1 
-                car[2,i]=j
-                car[0,i]=car[0,i]+j
-                return loop 
-               
-
-def drive_y_backward(car,x_grid,y_grid,j,i,j1,loop):
-    j=j*-1
-    j1=j1*-1
-    if car[1,i]+j1>0:
-        
-        if y_grid[int(car[1,i])+j] ==1 and car[4,i]==1 :
-            print("car in front ")
-            car[1,i]=0
-            loop=False
-            return loop
-        
-        
-        
-        if (j1*-1)>car[2,i] and car[4,i]==1:
-            #print("unobstructed drive")
-            y_grid[int(car[1,i])]=0
-            car[1,i]=car[1,i]+car[2,i]    
-                
-            y_grid[int(car[1,i])]=1
-            loop=False
-            return loop
-                                        
-                                        
-        elif y_grid[int(car[1,i])+j] !=1 and y_grid[int(car[1,i])+j1] !=1 and car[4,i]==1 : 
-            #print(" we can keep driving")
-            loop=True
-            return loop
-                
-        elif y_grid[int(car[1,i])+j] !=1 and y_grid[int(car[1,i])+j1] ==1 and car[4,i]==1 :
-            #print("Space occupied in front ")
-            overtake=False
-            y_grid[int(car[1,i])]=0
-            y_grid[int(car[1,i])+j]=1 
-            car[2,i]=j
-            car[1,i]=car[0,i]+j
-            loop=False
-            return loop
 
 
 def drive(car,x_grid,y_grid,j,i,j1,loop):
-        if car[4,i]==0:
-            drive_y_forward(car,x_grid,y_grid,j,i,j1,loop)
-    
-            
-        elif car[4,i]==1:
-            drive_y_backward(car,x_grid,y_grid,j,i,j1,loop)
-        elif car[4,i]==2:
-            drive_x_left(car,x_grid,y_grid,j,i,j1,loop)
-        elif car[4,i]==3:
-            drive_x_right(car,x_grid,y_grid,j,i,j1,loop)
+        if car[4,i]==0:#forward
+            drive_y(car,x_grid,y_grid,j,i,j1,loop,1)
+        elif car[4,i]==1:#backward
+            drive_y(car,x_grid,y_grid,j,i,j1,loop,-1)
+        elif car[4,i]==2:#left
+            drive_x(car,x_grid,y_grid,j,i,j1,loop,-1)
+        elif car[4,i]==3:#right
+            drive_x(car,x_grid,y_grid,j,i,j1,loop,1)
         return loop
+    
 def central_crossroad(car,x_grid,y_grid,j,i,j1):
     car[2,i]=0#car needs to stop at traffic light
-    car[3,i]=0
     print("WE ARE AT CENTRAL CROSS ROADS")
     
     which_way=np.random.randint(0,3)
@@ -274,10 +195,6 @@ def central_crossroad(car,x_grid,y_grid,j,i,j1):
         x_grid[2]=1
         car[4,i]=3
     
-        
-
-        
-        
 
 def new_velocity(car,x_grid,y_grid,lenth_of_road):
     for i in range(number_of_cars):
@@ -319,7 +236,7 @@ def new_velocity(car,x_grid,y_grid,lenth_of_road):
  
 
 print(car1)
-for h in range(20):
+for h in range(50):
     
     z,z1=new_velocity(car1,x_grid1,y_grid1,length_of_road)      
     print(z)
