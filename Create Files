@@ -1,0 +1,8 @@
+import os
+
+def main():
+
+ for dir in range(8,200,8):
+  dir_name = "Number of Cars " +str(dir) # Creates the directory name
+  os.mkdir(dir_name) #Creates directories in current directory
+main()
